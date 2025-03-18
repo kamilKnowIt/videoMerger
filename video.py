@@ -7,7 +7,7 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from scenedetect import VideoManager, SceneManager, open_video
 from scenedetect.detectors import ContentDetector
 
-API_KEY = "API_KEY"
+API_KEY = ".env"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
