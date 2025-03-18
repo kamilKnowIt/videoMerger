@@ -9,6 +9,7 @@ from scenedetect import SceneManager, open_video
 from scenedetect.detectors import ContentDetector
 from dotenv import load_dotenv
 
+
 # Wczytanie zmiennych środowiskowych
 load_dotenv()
 
