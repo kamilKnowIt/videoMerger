@@ -1,0 +1,34 @@
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    filepath TEXT NOT NULL,
+    duration FLOAT NOT NULL,
+    framerate INT NOT NULL,
+    width INT NOT NULL,
+    height INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE merges (
+    id SERIAL PRIMARY KEY,
+    video_1_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    video_2_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    output_filename VARCHAR(255) NOT NULL,
+    merge_method VARCHAR(50) NOT NULL, -- np. "fade", "morph", "cut"
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE descriptions (
+    id SERIAL PRIMARY KEY,
+    video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    description TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE animations (
+    id SERIAL PRIMARY KEY,
+    video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    music_track VARCHAR(255) NOT NULL,
+    animation_type VARCHAR(50) NOT NULL, -- np. "waveform", "beat-sync"
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
