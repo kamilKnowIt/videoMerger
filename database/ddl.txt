@@ -1,34 +1,52 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TABLE videos (
     id SERIAL PRIMARY KEY,
-    filename VARCHAR(255) NOT NULL,
-    filepath TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    format TEXT CHECK (format IN ('mp4', 'avi', 'mkv', 'mov')),
     duration FLOAT NOT NULL,
-    framerate INT NOT NULL,
-    width INT NOT NULL,
-    height INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    resolution TEXT,
+    framerate INT CHECK (framerate > 0),
+    size_in_bytes BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    category TEXT,
+    title TEXT,
+    youtube_id TEXT
 );
 
-CREATE TABLE merges (
+CREATE TABLE video_segments (
     id SERIAL PRIMARY KEY,
-    video_1_id INT REFERENCES videos(id) ON DELETE CASCADE,
-    video_2_id INT REFERENCES videos(id) ON DELETE CASCADE,
-    output_filename VARCHAR(255) NOT NULL,
-    merge_method VARCHAR(50) NOT NULL, -- np. "fade", "morph", "cut"
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    start_time FLOAT NOT NULL,
+    end_time FLOAT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE descriptions (
+CREATE TABLE video_vectors (
+    id SERIAL PRIMARY KEY,
+    video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    vector VECTOR(1536) NOT NULL
+);
+
+CREATE TABLE merged_videos (
+    id SERIAL PRIMARY KEY,
+    output_video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    merge_method TEXT CHECK (merge_method IN ('concatenation', 'morphing', 'highlights')),
+    timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE merged_video_inputs (
+    merged_video_id INT REFERENCES merged_videos(id) ON DELETE CASCADE,
+    input_video_id INT REFERENCES videos(id) ON DELETE CASCADE,
+    PRIMARY KEY (merged_video_id, input_video_id)
+);
+
+CREATE TABLE video_descriptions (
     id SERIAL PRIMARY KEY,
     video_id INT REFERENCES videos(id) ON DELETE CASCADE,
     description TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE animations (
-    id SERIAL PRIMARY KEY,
-    video_id INT REFERENCES videos(id) ON DELETE CASCADE,
-    music_track VARCHAR(255) NOT NULL,
-    animation_type VARCHAR(50) NOT NULL, -- np. "waveform", "beat-sync"
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT NOW(),
+    source TEXT, -- źródło opisu np. AI, użytkownik, automatyczny
+    language TEXT -- jezyk opisu
 );
